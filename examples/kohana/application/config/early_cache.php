@@ -13,6 +13,7 @@ return array(
     'secret_code' => '123',
 
     'rules' => array(
+		array('exact' => 'page', 'cachetime' => EARLY_CACHE_HOUR),
         array('startswith' => 'page', 'cachetime' => EARLY_CACHE_MINUTE),
         array('regexp' => '#^page#', 'cachetime' => EARLY_CACHE_NONE),
     ),

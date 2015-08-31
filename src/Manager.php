@@ -143,12 +143,24 @@ class Manager {
         if (!isset($this->cacheRule)) {
             foreach ($this->config->getRules() as $rule) {
 
-                $matchedRule = false;
-                if (isset($rule['startswith'])) {
+				if (!is_array($rule)) {
+					throw new \Exception('All rules have to be an array type');
+				}
+
+				if (!isset($rule['cachetime'])) {
+					throw new \Exception('No `cachetime` in rule: ' . print_r($rule, true));
+				}
+
+				$availableMatches = array('exact', 'startswith', 'regexp',);
+				if (isset($rule['exact'])) {
+					$matchedRule = $rule['exact'] == $this->env->getUri();
+				} elseif (isset($rule['startswith'])) {
                     $matchedRule = $rule['startswith'] == substr($this->env->getUri(), 0, strlen($rule['startswith']));
                 } elseif (isset($rule['regexp'])) {
                     $matchedRule = (bool)preg_match($rule['regexp'], $this->env->getUri());
-                }
+                } else {
+					throw new \Exception('A rule does not have available match: ' . implode(', ', $availableMatches));
+				}
 
                 if ($matchedRule) {
                     $this->cacheRule = $rule;
