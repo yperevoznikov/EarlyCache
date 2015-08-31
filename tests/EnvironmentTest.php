@@ -16,19 +16,23 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase {
     public function testGetUri() {
         $server = array('REQUEST_URI' => '/page/test/');
         $env = new Environment(array(), $server, array());
-        $this->assertEquals('page/test', $env->getUri());
+        $this->assertEquals('/page/test', $env->getUri());
 
         $server = array('REQUEST_URI' => '/page/test');
         $env = new Environment(array(), $server, array());
-        $this->assertEquals('page/test', $env->getUri());
+        $this->assertEquals('/page/test', $env->getUri());
 
         $server = array('REQUEST_URI' => 'page/test');
         $env = new Environment(array(), $server, array());
-        $this->assertEquals('page/test', $env->getUri());
+        $this->assertEquals('/page/test', $env->getUri());
 
-        $server = array('REQUEST_URI' => 'page/test/?n=v');
-        $env = new Environment(array(), $server, array());
-        $this->assertEquals('page/test/?n=v', $env->getUri());
+		$server = array('REQUEST_URI' => 'page/test/?n=v');
+		$env = new Environment(array(), $server, array());
+		$this->assertEquals('/page/test/?n=v', $env->getUri());
+
+		$server = array();
+		$env = new Environment(array(), $server, array());
+		$this->assertEquals('/', $env->getUri());
     }
 
     public function testGet(){

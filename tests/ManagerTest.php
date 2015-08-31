@@ -52,13 +52,25 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
 
     }
 
-    public function testSetCache() {
-        $env = new Environment(array(), array(), array());
-        $mgr = new Manager($this->cfg1, $env);
-        $mgr->setCache('content', 'text/html', 200);
+	/**
+	 * @dataProvider dataProviderTestSetCache
+	 */
+    public function testSetCache($get, $server, $cookie, $expectedFilesCount) {
 
-        // check that cache was created: content file + meta file + 2 virtual (".", "..") files
-        $this->assertCount(4, $files = scandir($this->tmpDir));
+		$env = new Environment($get, $server, $cookie);
+		$mgr = new Manager($this->cfg1, $env);
+		$mgr->setCache('content', 'text/html', 200);
+
+		// check that cache was created: cache files + 2 virtual (".", "..") files
+		$this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));
+
     }
+
+	public function dataProviderTestSetCache(){
+		return array(
+			array(array(), array(), array(), 4),
+			array(array(), array('REQUEST_URI'=>'rangom/path/1'), array(), 2),
+		);
+	}
 
 }

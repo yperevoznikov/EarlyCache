@@ -28,16 +28,17 @@ class Environment
     }
 
     public function getUri() {
-        $uri = '';
+        $uri = '/';
         if (isset($this->server['REQUEST_URI'])) {
             $uri = $this->server['REQUEST_URI'];
         }
 
-        $uri = ltrim($uri, '/');
-
         if (0 == substr_count($uri, '?')) {
             $uri = rtrim($uri, '/');
         }
+
+		// Trim slash on left side and put one slash at the beginning
+		$uri = '/' . ltrim($uri, '/');
 
         return $uri;
     }

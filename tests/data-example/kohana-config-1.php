@@ -8,8 +8,8 @@ return array(
     'secret_code' => '123',
 
     'rules' => array(
-        array('startswith' => '', 'cachetime' => 60),
-        array('regexp' => '#^page#', 'cachetime' => 0),
+        array('regexp' => '#^/$#', 'cachetime' => 60),
+        array('startswith' => '/page', 'cachetime' => 0),
     ),
 
 );

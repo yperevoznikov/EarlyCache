@@ -126,7 +126,7 @@ class Manager {
     }
 
     private function getCacheTime() {
-        if (null === $this->getCacheRule()) {
+        if (false === $this->getCacheRule()) {
             return 0;
         }
 
