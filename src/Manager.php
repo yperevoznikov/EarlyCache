@@ -133,7 +133,7 @@ class Manager {
         $cacheRule = $this->getCacheRule();
 
         if (!isset($cacheRule['cachetime'])) {
-            throw new \Exception('No `cachetime` defined for rule in EarlyCache rules');
+            throw new \Exception('No `cachetime` defined for rule in EarlyCache rules: ' . print_r($cacheRule, true));
         }
 
         return $cacheRule['cachetime'];
