@@ -1,0 +1,23 @@
+{
+    "name": "yperevoznikov/earlycache",
+    "description": "Implements early cache for web applications",
+    "type": "Library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Yuriy Perevoznikov",
+            "email": "yuriless@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {
+      "phpunit/phpunit": "~4.5"
+    },
+    "autoload": {
+      "psr-4": {"YPEarlyCache\\": ["src", "src/config"]}
+    },
+    "autoload-dev": {
+      "psr-4": {"YPEarlyCache\\": "tests"}
+    }
+}
