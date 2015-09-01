@@ -4,6 +4,8 @@ namespace YPEarlyCache;
 
 class Manager {
 
+	const EXT_META = '.json';
+
     /**
      * @var Config
      */
@@ -37,7 +39,7 @@ class Manager {
         }
 
         $content = file_get_contents($this->getCacheFilepath());
-        $rawMeta = file_get_contents($this->getCacheFilepath() . '.meta');
+        $rawMeta = file_get_contents($this->getCacheFilepath() . self::EXT_META);
         $meta = json_decode($rawMeta);
 
         if (false === $content || false === $meta) {
@@ -88,7 +90,7 @@ class Manager {
         file_put_contents($filepath, $content);
 
         // save meta file
-        file_put_contents($filepath . '.json', json_encode($meta));
+        file_put_contents($filepath . self::EXT_META, json_encode($meta));
     }
 
     private function getHashFromUrl() {
@@ -98,7 +100,7 @@ class Manager {
     private function canGetCache() {
 
         $filepath = $this->getCacheFilepath();
-        if (!file_exists($filepath) || !file_exists($filepath . '.json')) {
+        if (!file_exists($filepath) || !file_exists($filepath . self::EXT_META)) {
             return false;
         }
 
@@ -109,7 +111,7 @@ class Manager {
         $modificationTimestamp = filemtime($filepath);
         if (time() - $modificationTimestamp > $this->getCacheTime()) {
             @unlink($filepath);
-            @unlink($filepath . '.json');
+            @unlink($filepath . self::EXT_META);
             return false;
         }
 
