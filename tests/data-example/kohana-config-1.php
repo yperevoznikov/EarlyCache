@@ -2,6 +2,7 @@
 
 return array(
     'enabled' => true,
+	'debug' => true,
     'cache_dir' => dirname(__FILE__) . '/cache-tmp',
     'cookie_no_cache' => array('authautologin'),
     'minimize_html' => true,

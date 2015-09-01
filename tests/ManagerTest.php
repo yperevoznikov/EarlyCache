@@ -59,7 +59,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
 
 		$env = new Environment($get, $server, $cookie);
 		$mgr = new Manager($this->cfg1, $env);
-		$mgr->setCache('content', 'text/html', 200);
+		$mgr->setCache('content', array('Content-Type' => 'text/html'), 200);
 
 		// check that cache was created: cache files + 2 virtual (".", "..") files
 		$this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));

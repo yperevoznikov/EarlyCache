@@ -44,15 +44,22 @@ class Manager {
             return false;
         }
 
-        $this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
-        $this->env->setHeader("Content-Type: " . $meta->memo);
+		$this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
+		foreach ($meta->headers as $headerName => $headerValue) {
+			$this->env->setHeader($headerName . ': ' . $headerValue);
+		}
+
+		if ($this->config->isDebug()) {
+			$content = $this->addDebugInfo($content, $meta);
+		}
+
         $this->env->printToOutput($content);
         $this->env->finishOutput();
 
         return true;
     }
 
-    public function setCache($inContent, $memoType, $responseCode) {
+    public function setCache($inContent, array $headers, $responseCode) {
 
         if (!$this->needSetCache()) {
             return;
@@ -69,9 +76,10 @@ class Manager {
         }
 
         $meta = array(
+			'time' => date('Y/m/d H:i:s'),
             'hash' => $this->getHashFromUrl(),
             'url' => $this->env->getUri(),
-            'memo' => $memoType,
+            'headers' => $headers,
             'code' => $responseCode,
             'rule' => $this->getCacheRule(),
         );
@@ -183,115 +191,17 @@ class Manager {
         return $filepath;
     }
 
-//    private function earlyCacheGetType($path) {
-//
-//        $pathParts = explode("?", $path);
-//        if (0 === count($pathParts)) {
-//            return 'home';
-//        }
-//        $pathDir = trim(array_shift($pathParts), '/\\');
-//        if ('' === $pathDir) {
-//            return 'home';
-//        }
-//        if ('admin' === substr($pathDir, 0, 5)) {
-//            return 'admin';
-//        }
-//        if ('auth' === substr($pathDir, 0, 4)) {
-//            return 'auth';
-//        }
-//        if ('game' === substr($pathDir, 0, 4)) {
-//            return 'game';
-//        }
-//        if ('category' === substr($pathDir, 0, 8)) {
-//            return 'category';
-//        }
-//        if ('tag' === substr($pathDir, 0, 3)) {
-//            return 'tag';
-//        }
-//        if ('selection' === substr($pathDir, 0, 3)) {
-//            return 'selection';
-//        }
-//        if ('search' === substr($pathDir, 0, 6)) {
-//            return 'search';
-//        }
-//        if ('video' === substr($pathDir, 0, 5)) {
-//            return 'video';
-//        }
-//        if ('actors' === substr($pathDir, 0, 6)) {
-//            return 'actor';
-//        }
-//        if ('actor' === substr($pathDir, 0, 6)) {
-//            return 'actor';
-//        }
-//        if ('actress' === substr($pathDir, 0, 7)) {
-//            return 'actor';
-//        }
-//        if ('page' === substr($pathDir, 0, 4)) {
-//            return 'page';
-//        }
-//
-//        return 'video_page';
-//    }
-//
-//    private function earlyCacheGetCacheSeconds($type) {
-//
-//        if (isset($_GET["early_cache_type"]) && "true" == $_GET["early_cache_type"]) {
-//            echo $type;
-//        }
-//
-//        switch ($type) {
-//            case 'video_page':
-//            case 'video':
-//    //            return 86400;
-//    //            return 14400;
-//                return 7200;
-//                break;
-//            case 'tag':
-//            case 'selection':
-//            case 'category':
-//            case 'actor':
-//                return 3600;
-//    //				return 1800;
-//                break;
-//            case 'home':
-//                return 300;
-//                break;
-//            case 'game':
-//            case 'admin':
-//            case 'search':
-//            case 'page':
-//            default:
-//                return 0;
-//        }
-//    }
-//
-//    private function earlyCacheNeedCache($uri) {
-//        $type = $this->earlyCacheGetType($uri);
-//        if ($this->earlyCacheGetCacheSeconds($type) > 0) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    private function earlyCacheGetHtml($uri) {
-//
-//        global $early_cache_dir;
-//
-//        $type = $this->earlyCacheGetType($uri);
-//        $secondsToCache = $this->earlyCacheGetCacheSeconds($type);
-//        $hash = md5($uri);
-//        $filepath = "{$early_cache_dir}/{$hash}";
-//        if (!file_exists($filepath)) {
-//            return false;
-//        }
-//        $modificationTimestamp = filemtime($filepath);
-//        if (time() - $modificationTimestamp > $secondsToCache) {
-//            unlink($filepath);
-//            return false;
-//        }
-//        return file_get_contents($filepath);
-//    }
-//
+	private function addDebugInfo($inContent, $meta)
+	{
+		$content = $inContent;
+
+		$debugContent  = "<pre>";
+		$debugContent .= print_r($meta, true);
+		$debugContent .= "</pre>";
+
+		$content = str_replace('</body>', "$debugContent</body>", $content);
+
+		return $content;
+	}
 
 }

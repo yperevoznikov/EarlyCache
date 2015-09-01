@@ -20,10 +20,13 @@ class KohanaConfig extends Config {
             }
         }
 
-        if (isset($params['minimize_html'])) {
-            $this->minimizeHtml = $params['minimize_html'];
-        }
+		if (isset($params['minimize_html'])) {
+			$this->minimizeHtml = $params['minimize_html'];
+		}
 
+		if (isset($params['debug'])) {
+			$this->debug = $params['debug'];
+		}
 
     }
 
