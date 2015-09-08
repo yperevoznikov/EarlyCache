@@ -86,11 +86,14 @@ class Manager {
             'rule' => $this->getCacheRule(),
         );
 
-        // save content file
-        file_put_contents($filepath, $content);
+        // save content file and meta file
+        if (
+			false === file_put_contents($filepath, $content) ||
+			false === file_put_contents($filepath . self::EXT_META, json_encode($meta))
+		) {
+			throw new \Exception('Could not write cache to directory');
+		}
 
-        // save meta file
-        file_put_contents($filepath . self::EXT_META, json_encode($meta));
     }
 
     private function getHashFromUrl() {
