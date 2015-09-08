@@ -91,7 +91,7 @@ class Manager {
 			false === file_put_contents($filepath, $content) ||
 			false === file_put_contents($filepath . self::EXT_META, json_encode($meta))
 		) {
-			throw new \Exception('Could not write cache to directory');
+			throw new \Exception('Could not write early cache to directory ' . $this->config->getCacheDir());
 		}
 
     }
