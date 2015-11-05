@@ -34,6 +34,11 @@ class Manager {
     }
 
     public function flushCacheIfAble() {
+
+        if (!$this->config->isEnabled()) {
+            return false;
+        }
+
         if (!$this->canGetCache()) {
             return false;
         }
