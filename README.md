@@ -1,4 +1,2 @@
-
-# Early cache module
-
-This module that independed from any other dependencies for imediate php response
+# Early Cache PHP module
+Early cache implementation without dependencies for fast web app response. Caches page content with headers.
