@@ -1,8 +1,8 @@
 {
     "name": "yperevoznikov/earlycache",
-    "description": "Implements early cache for web applications",
+    "description": "Implements early cache for web applications without dependencies",
     "type": "Library",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Yuriy Perevoznikov",
