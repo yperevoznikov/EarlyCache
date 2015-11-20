@@ -8,7 +8,11 @@ use \YPEarlyCache\Factory;
 $manager = Factory::getManager(Factory::PLATFORM_KOHANA, 'path\to\config.php', $_GET, $_SERVER, $_COOKIE);
 if (!$manager->flushCacheIfAble()) {
 
-    // generate $content, $memoType, $responseCode
+    //
+    // generate $content, $memoType, $responseCode here
+    //
+
+    // save cache
     $manager->setCache($content, $memoType, $responseCode);
 
 }

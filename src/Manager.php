@@ -14,6 +14,14 @@ class Manager {
      */
     private $env;
 
+    /**
+     * @var \string[]
+     */
+    private $tags;
+
+    /**
+     * @var array
+     */
     private $cacheRule = null;
 
     public function __construct(Config $config, Environment $env){
@@ -74,6 +82,7 @@ class Manager {
             'memo' => $memoType,
             'code' => $responseCode,
             'rule' => $this->getCacheRule(),
+            'tags' => $this->getTags(),
         );
 
         // save content file
@@ -171,115 +180,53 @@ class Manager {
         return $filepath;
     }
 
-//    private function earlyCacheGetType($path) {
-//
-//        $pathParts = explode("?", $path);
-//        if (0 === count($pathParts)) {
-//            return 'home';
-//        }
-//        $pathDir = trim(array_shift($pathParts), '/\\');
-//        if ('' === $pathDir) {
-//            return 'home';
-//        }
-//        if ('admin' === substr($pathDir, 0, 5)) {
-//            return 'admin';
-//        }
-//        if ('auth' === substr($pathDir, 0, 4)) {
-//            return 'auth';
-//        }
-//        if ('game' === substr($pathDir, 0, 4)) {
-//            return 'game';
-//        }
-//        if ('category' === substr($pathDir, 0, 8)) {
-//            return 'category';
-//        }
-//        if ('tag' === substr($pathDir, 0, 3)) {
-//            return 'tag';
-//        }
-//        if ('selection' === substr($pathDir, 0, 3)) {
-//            return 'selection';
-//        }
-//        if ('search' === substr($pathDir, 0, 6)) {
-//            return 'search';
-//        }
-//        if ('video' === substr($pathDir, 0, 5)) {
-//            return 'video';
-//        }
-//        if ('actors' === substr($pathDir, 0, 6)) {
-//            return 'actor';
-//        }
-//        if ('actor' === substr($pathDir, 0, 6)) {
-//            return 'actor';
-//        }
-//        if ('actress' === substr($pathDir, 0, 7)) {
-//            return 'actor';
-//        }
-//        if ('page' === substr($pathDir, 0, 4)) {
-//            return 'page';
-//        }
-//
-//        return 'video_page';
-//    }
-//
-//    private function earlyCacheGetCacheSeconds($type) {
-//
-//        if (isset($_GET["early_cache_type"]) && "true" == $_GET["early_cache_type"]) {
-//            echo $type;
-//        }
-//
-//        switch ($type) {
-//            case 'video_page':
-//            case 'video':
-//    //            return 86400;
-//    //            return 14400;
-//                return 7200;
-//                break;
-//            case 'tag':
-//            case 'selection':
-//            case 'category':
-//            case 'actor':
-//                return 3600;
-//    //				return 1800;
-//                break;
-//            case 'home':
-//                return 300;
-//                break;
-//            case 'game':
-//            case 'admin':
-//            case 'search':
-//            case 'page':
-//            default:
-//                return 0;
-//        }
-//    }
-//
-//    private function earlyCacheNeedCache($uri) {
-//        $type = $this->earlyCacheGetType($uri);
-//        if ($this->earlyCacheGetCacheSeconds($type) > 0) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    private function earlyCacheGetHtml($uri) {
-//
-//        global $early_cache_dir;
-//
-//        $type = $this->earlyCacheGetType($uri);
-//        $secondsToCache = $this->earlyCacheGetCacheSeconds($type);
-//        $hash = md5($uri);
-//        $filepath = "{$early_cache_dir}/{$hash}";
-//        if (!file_exists($filepath)) {
-//            return false;
-//        }
-//        $modificationTimestamp = filemtime($filepath);
-//        if (time() - $modificationTimestamp > $secondsToCache) {
-//            unlink($filepath);
-//            return false;
-//        }
-//        return file_get_contents($filepath);
-//    }
-//
+    /**
+     * @param string|array $tagName
+     */
+    public function addTag($tagName)
+    {
+        if (is_array($tagName)) {
+            foreach ($tagName as $tagNameItem) {
+                if (is_string($tagNameItem)) {
+                    $this->tags[] = $tagNameItem;
+                }
+            }
+        } elseif (is_string($tagName)) {
+            $this->tags[] = $tagName;
+        }
+        $this->tags = array_values(array_unique($this->tags));
+    }
+
+    /**
+     * @return \string[]
+     */
+    private function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param $tag
+     * @return int
+     */
+    public function deleteByTag($tag)
+    {
+        $deletedCount = 0;
+        $files = scandir($this->config->getCacheDir());
+        foreach ($files as $file) {
+            if (($temp = strlen($file) - strlen('.json')) >= 0 && strpos($file, '.json', $temp) !== FALSE) {
+                $fileJsonFullpath = $this->config->getCacheDir() . '/' . $file;
+                $jsonContent = file_get_contents($fileJsonFullpath);
+                $jsonObj = json_decode($jsonContent);
+                if (is_object($jsonObj) && is_array($jsonObj->tags) && in_array($tag, $jsonObj->tags)) {
+                    $contentFilename = substr($fileJsonFullpath, 0, strlen($fileJsonFullpath) - 5);
+                    unlink($contentFilename);
+                    unlink($fileJsonFullpath);
+                    $deletedCount++;
+                }
+            }
+        }
+        return $deletedCount;
+    }
 
 }
