@@ -14,6 +14,14 @@ class Manager {
      */
     private $env;
 
+    /**
+     * @var \string[]
+     */
+    private $tags;
+
+    /**
+     * @var array
+     */
     private $cacheRule = null;
 
     public function __construct(Config $config, Environment $env){
@@ -74,6 +82,7 @@ class Manager {
             'memo' => $memoType,
             'code' => $responseCode,
             'rule' => $this->getCacheRule(),
+            'tags' => $this->getTags(),
         );
 
         // save content file
@@ -169,6 +178,55 @@ class Manager {
         $earlyCacheDir = $this->config->getCacheDir();
         $filepath = "{$earlyCacheDir}/{$hash}";
         return $filepath;
+    }
+
+    /**
+     * @param string|array $tagName
+     */
+    public function addTag($tagName)
+    {
+        if (is_array($tagName)) {
+            foreach ($tagName as $tagNameItem) {
+                if (is_string($tagNameItem)) {
+                    $this->tags[] = $tagNameItem;
+                }
+            }
+        } elseif (is_string($tagName)) {
+            $this->tags[] = $tagName;
+        }
+        $this->tags = array_values(array_unique($this->tags));
+    }
+
+    /**
+     * @return \string[]
+     */
+    private function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param $tag
+     * @return int
+     */
+    public function deleteByTag($tag)
+    {
+        $deletedCount = 0;
+        $files = scandir($this->config->getCacheDir());
+        foreach ($files as $file) {
+            if (($temp = strlen($file) - strlen('.json')) >= 0 && strpos($file, '.json', $temp) !== FALSE) {
+                $fileJsonFullpath = $this->config->getCacheDir() . '/' . $file;
+                $jsonContent = file_get_contents($fileJsonFullpath);
+                $jsonObj = json_decode($jsonContent);
+                if (is_object($jsonObj) && is_array($jsonObj->tags) && in_array($tag, $jsonObj->tags)) {
+                    $contentFilename = substr($fileJsonFullpath, 0, strlen($fileJsonFullpath) - 5);
+                    unlink($contentFilename);
+                    unlink($fileJsonFullpath);
+                    $deletedCount++;
+                }
+            }
+        }
+        return $deletedCount;
     }
 
 }

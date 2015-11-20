@@ -61,7 +61,7 @@ abstract class Config {
     }
 
     /**
-     * @var bool
+     * @return bool
      */
     public function needMinimizeHtml(){
         return $this->minimizeHtml;
