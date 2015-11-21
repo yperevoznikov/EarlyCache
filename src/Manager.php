@@ -35,6 +35,9 @@ class Manager {
             if (in_array($file, array('.', '..'))) {
                 continue;
             }
+            if (is_dir($this->config->getCacheDir() . '/' . $file)) {
+                continue;
+            }
             unlink($this->config->getCacheDir() . DIRECTORY_SEPARATOR . $file);
         }
     }
@@ -76,14 +79,21 @@ class Manager {
             $content = $inContent;
         }
 
+        $hash = $this->getHashFromUrl();
         $meta = array(
-            'hash' => $this->getHashFromUrl(),
+            'hash' => $hash,
             'url' => $this->env->getUri(),
             'memo' => $memoType,
             'code' => $responseCode,
             'rule' => $this->getCacheRule(),
             'tags' => $this->getTags(),
         );
+
+        if (count($this->getTags()) > 0) {
+            foreach ($this->getTags() as $tag) {
+                $this->addTagToIndex($tag, $hash);
+            }
+        }
 
         // save content file
         file_put_contents($filepath, $content);
@@ -212,21 +222,46 @@ class Manager {
     public function deleteByTag($tag)
     {
         $deletedCount = 0;
-        $files = scandir($this->config->getCacheDir());
-        foreach ($files as $file) {
-            if (($temp = strlen($file) - strlen('.json')) >= 0 && strpos($file, '.json', $temp) !== FALSE) {
-                $fileJsonFullpath = $this->config->getCacheDir() . '/' . $file;
-                $jsonContent = file_get_contents($fileJsonFullpath);
-                $jsonObj = json_decode($jsonContent);
-                if (is_object($jsonObj) && is_array($jsonObj->tags) && in_array($tag, $jsonObj->tags)) {
-                    $contentFilename = substr($fileJsonFullpath, 0, strlen($fileJsonFullpath) - 5);
-                    unlink($contentFilename);
-                    unlink($fileJsonFullpath);
-                    $deletedCount++;
-                }
-            }
-        }
+
+		$tagsIndexFilepath = $this->config->getCacheDir() . "/tagsIndex/" . $tag . '.json';
+		if (file_exists($tagsIndexFilepath)) {
+			$tagsIndexContent = file_get_contents($tagsIndexFilepath);
+			$tagsIndexArr = json_decode($tagsIndexContent);
+
+			if (false !== $tagsIndexArr) {
+				foreach ($tagsIndexArr as $tagsIndexHash) {
+					unlink($this->config->getCacheDir() . '/' . $tagsIndexHash);
+					unlink($this->config->getCacheDir() . '/' . $tagsIndexHash . '.json');
+					$deletedCount++;
+				}
+			}
+			unlink($tagsIndexFilepath);
+		}
+
         return $deletedCount;
+    }
+
+    /**
+     * @param string $tag
+     * @param string $hash
+     */
+    private function addTagToIndex($tag, $hash)
+    {
+        $tagsIndexDir = $this->config->getCacheDir() . '/tagsIndex';
+        if (!file_exists($tagsIndexDir)) {
+            mkdir($tagsIndexDir);
+        }
+
+        $tagsIndexFilepath = $tagsIndexDir . '/' . $tag . '.json';
+        $jsonContent = file_exists($tagsIndexFilepath) ? file_get_contents($tagsIndexFilepath) : '[]';
+        $jsonArr = json_decode($jsonContent);
+        $jsonArr = is_array($jsonArr) ? $jsonArr : array();
+
+        $jsonArr[] = $hash;
+		$jsonArr = array_unique($jsonArr);
+
+        $jsonContent = json_encode($jsonArr);
+        file_put_contents($tagsIndexFilepath, $jsonContent);
     }
 
 }

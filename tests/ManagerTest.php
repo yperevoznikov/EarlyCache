@@ -13,14 +13,17 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
 
     private $tmpDir;
 
-    private function deleteFilesInTmpDir(){
-        $files = scandir($this->tmpDir);
+    private function delTree($dir) {
+        $files = array_diff(scandir($dir), array('.','..'));
         foreach ($files as $file) {
-            if (in_array($file, array('.', '..'))) {
-                continue;
-            }
-            unlink($this->tmpDir . DIRECTORY_SEPARATOR . $file);
+            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
         }
+        return rmdir($dir);
+    }
+
+    private function deleteFilesInTmpDir(){
+        $this->delTree($this->tmpDir);
+        mkdir($this->tmpDir);
     }
     
     public function setUp() {
@@ -41,7 +44,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         file_put_contents($this->tmpDir . DIRECTORY_SEPARATOR . 'test1.txt', 'random content #1');
         file_put_contents($this->tmpDir . DIRECTORY_SEPARATOR . 'test2.txt', 'random content #2');
 
-        // ensure that test files were really created: 2 created files + 2 virtual (".", "..") files
+        // ensure that test files were really created: 2 created files + 2 misc ("./", "../") dirs
         $this->assertCount(4, $files = scandir($this->tmpDir));
 
         // create manager & remove all cache
@@ -49,9 +52,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $mgr = new Manager($this->cfg1, $env);
         $mgr->deleteAllCache();
 
-        // check that cache was deleted: remaining 2 virtual (".", "..") files
+        // check that cache was deleted: remaining 2 virtual (".", "..") dirs
         $this->assertCount(2, $files = scandir($this->tmpDir));
-
     }
 
     public function testSetCache() {
@@ -59,7 +61,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $mgr = new Manager($this->cfg3, $env);
         $mgr->setCache('content', 'text/html', 200);
 
-        // check that cache was created: content file + meta file + 2 virtual (".", "..") files
+        // check that cache was created: content file + meta file + 2 misc ("./", "../") dirs
         $this->assertCount(4, $files = scandir($this->tmpDir));
     }
 
@@ -85,6 +87,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertContains('tag1', $jsonObj->tags);
         $this->assertContains('tag2', $jsonObj->tags);
         $this->assertcount(2, $jsonObj->tags);
+
+        $this->assertFileExists($this->tmpDir . '/tagsIndex/tag1.json');
+        $this->assertFileExists($this->tmpDir . '/tagsIndex/tag2.json');
 
         $deletedCount = $mgr->deleteByTag('not-existed-tag');
         $this->assertEquals(0, $deletedCount);
