@@ -4,6 +4,8 @@ namespace YPEarlyCache;
 
 class Manager {
 
+	const EXT_META = '.json';
+
     /**
      * @var Config
      */
@@ -43,27 +45,39 @@ class Manager {
     }
 
     public function flushCacheIfAble() {
+
+        if (!$this->config->isEnabled()) {
+            return false;
+        }
+
         if (!$this->canGetCache()) {
             return false;
         }
 
         $content = file_get_contents($this->getCacheFilepath());
-        $rawMeta = file_get_contents($this->getCacheFilepath() . '.meta');
+        $rawMeta = file_get_contents($this->getCacheFilepath() . self::EXT_META);
         $meta = json_decode($rawMeta);
 
         if (false === $content || false === $meta) {
             return false;
         }
 
-        $this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
-        $this->env->setHeader("Content-Type: " . $meta->memo);
+		$this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
+		foreach ($meta->headers as $headerName => $headerValue) {
+			$this->env->setHeader($headerName . ': ' . $headerValue);
+		}
+
+		if ($this->config->isDebug()) {
+			$content = $this->addDebugInfo($content, $meta);
+		}
+
         $this->env->printToOutput($content);
         $this->env->finishOutput();
 
         return true;
     }
 
-    public function setCache($inContent, $memoType, $responseCode) {
+    public function setCache($inContent, array $headers, $responseCode) {
 
         if (!$this->needSetCache()) {
             return;
@@ -82,8 +96,9 @@ class Manager {
         $hash = $this->getHashFromUrl();
         $meta = array(
             'hash' => $hash,
+			'time' => date('Y/m/d H:i:s'),
             'url' => $this->env->getUri(),
-            'memo' => $memoType,
+            'headers' => $headers,
             'code' => $responseCode,
             'rule' => $this->getCacheRule(),
             'tags' => $this->getTags(),
@@ -95,11 +110,13 @@ class Manager {
             }
         }
 
-        // save content file
-        file_put_contents($filepath, $content);
-
-        // save meta file
-        file_put_contents($filepath . '.json', json_encode($meta));
+        // save content file and meta file
+        if (
+			false === file_put_contents($filepath, $content) ||
+			false === file_put_contents($filepath . self::EXT_META, json_encode($meta))
+		) {
+			throw new \Exception('Could not write early cache to directory ' . $this->config->getCacheDir());
+		}
     }
 
     private function getHashFromUrl() {
@@ -109,7 +126,7 @@ class Manager {
     private function canGetCache() {
 
         $filepath = $this->getCacheFilepath();
-        if (!file_exists($filepath) || !file_exists($filepath . '.json')) {
+        if (!file_exists($filepath) || !file_exists($filepath . self::EXT_META)) {
             return false;
         }
 
@@ -120,7 +137,7 @@ class Manager {
         $modificationTimestamp = filemtime($filepath);
         if (time() - $modificationTimestamp > $this->getCacheTime()) {
             @unlink($filepath);
-            @unlink($filepath . '.json');
+            @unlink($filepath . self::EXT_META);
             return false;
         }
 
@@ -145,14 +162,14 @@ class Manager {
     }
 
     private function getCacheTime() {
-        if (null === $this->getCacheRule()) {
+        if (false === $this->getCacheRule()) {
             return 0;
         }
 
         $cacheRule = $this->getCacheRule();
 
         if (!isset($cacheRule['cachetime'])) {
-            throw new \Exception('No `cachetime` defined for rule in EarlyCache rules');
+            throw new \Exception('No `cachetime` defined for rule in EarlyCache rules: ' . print_r($cacheRule, true));
         }
 
         return $cacheRule['cachetime'];
@@ -162,12 +179,24 @@ class Manager {
         if (!isset($this->cacheRule)) {
             foreach ($this->config->getRules() as $rule) {
 
-                $matchedRule = false;
-                if (isset($rule['startswith'])) {
+				if (!is_array($rule)) {
+					throw new \Exception('All rules have to be an array type');
+				}
+
+				if (!isset($rule['cachetime'])) {
+					throw new \Exception('No `cachetime` in rule: ' . print_r($rule, true));
+				}
+
+				$availableMatches = array('exact', 'startswith', 'regexp',);
+				if (isset($rule['exact'])) {
+					$matchedRule = $rule['exact'] == $this->env->getUri();
+				} elseif (isset($rule['startswith'])) {
                     $matchedRule = $rule['startswith'] == substr($this->env->getUri(), 0, strlen($rule['startswith']));
                 } elseif (isset($rule['regexp'])) {
                     $matchedRule = (bool)preg_match($rule['regexp'], $this->env->getUri());
-                }
+                } else {
+					throw new \Exception('A rule does not have available match: ' . implode(', ', $availableMatches));
+				}
 
                 if ($matchedRule) {
                     $this->cacheRule = $rule;
@@ -263,5 +292,18 @@ class Manager {
         $jsonContent = json_encode($jsonArr);
         file_put_contents($tagsIndexFilepath, $jsonContent);
     }
+
+	private function addDebugInfo($inContent, $meta)
+	{
+		$content = $inContent;
+
+		$debugContent  = "<pre>";
+		$debugContent .= print_r($meta, true);
+		$debugContent .= "</pre>";
+
+		$content = str_replace('</body>', "$debugContent</body>", $content);
+
+		return $content;
+	}
 
 }

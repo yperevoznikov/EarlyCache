@@ -56,13 +56,34 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(2, $files = scandir($this->tmpDir));
     }
 
-    public function testSetCache() {
-        $env = new Environment(array(), array(), array());
-        $mgr = new Manager($this->cfg3, $env);
-        $mgr->setCache('content', 'text/html', 200);
+    // public function testSetCache() {
+    //     $env = new Environment(array(), array(), array());
+    //     $mgr = new Manager($this->cfg3, $env);
+    //     $mgr->setCache('content', 'text/html', 200);
 
-        // check that cache was created: content file + meta file + 2 misc ("./", "../") dirs
-        $this->assertCount(4, $files = scandir($this->tmpDir));
+    //     // check that cache was created: content file + meta file + 2 misc ("./", "../") dirs
+    //     $this->assertCount(4, $files = scandir($this->tmpDir));
+    // }
+
+    /**
+     * @dataProvider dataProviderTestSetCache
+     */
+    public function testSetCache($get, $server, $cookie, $expectedFilesCount) {
+
+        $env = new Environment($get, $server, $cookie);
+        $mgr = new Manager($this->cfg1, $env);
+        $mgr->setCache('content', array('Content-Type' => 'text/html'), 200);
+
+        // check that cache was created: cache files + 2 virtual (".", "..") files
+        $this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));
+
+    }
+
+    public function dataProviderTestSetCache(){
+        return array(
+            array(array(), array(), array(), 4),
+            array(array(), array('REQUEST_URI'=>'rangom/path/1'), array(), 2),
+        );
     }
 
     public function testTags() {

@@ -13,14 +13,20 @@ class KohanaConfigTest extends \PHPUnit_Framework_TestCase {
      */
     private $cfg1;
 
-    /**
-     * @var KohanaConfig
-     */
-    private $cfg2;
+	/**
+	 * @var KohanaConfig
+	 */
+	private $cfg2;
+
+	/**
+	 * @var KohanaConfig
+	 */
+	private $cfg3;
 
     public function setUp(){
         $this->cfg1 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-1.php');
-        $this->cfg2 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-2.php');
+		$this->cfg2 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-2.php');
+		$this->cfg3 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-3.php');
     }
 
     /**
@@ -54,5 +60,11 @@ class KohanaConfigTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->cfg1->needMinimizeHtml());
         $this->assertFalse($this->cfg2->needMinimizeHtml());
     }
+
+	public function testIsDebug(){
+		$this->assertTrue($this->cfg1->isDebug());
+		$this->assertFalse($this->cfg2->isDebug());
+		$this->assertFalse($this->cfg3->isDebug());
+	}
 
 }

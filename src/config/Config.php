@@ -4,10 +4,15 @@ namespace YPEarlyCache;
 
 abstract class Config {
 
-    /**
-     * @var bool
-     */
-    protected $enabled = false;
+	/**
+	 * @var bool
+	 */
+	protected $enabled = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $debug = false;
 
     /**
      * @var string
@@ -35,6 +40,14 @@ abstract class Config {
     {
         return $this->enabled;
     }
+
+	/**
+	 * @return boolean
+	 */
+	public function isDebug()
+	{
+		return $this->debug;
+	}
 
     /**
      * @return string
