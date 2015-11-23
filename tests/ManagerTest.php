@@ -94,11 +94,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $mgr->addTag(array('tag1', 'tag2'));
         $mgr->addTag(array('tag2', array('tag3')));
 
-        $mgr->setCache('content', 'text/html', 200);
+        $mgr->setCache('content', array('Content-Type' => 'text/html'), 200);
 
         // created filepath
-        $jsonFilepath = $this->tmpDir . '/d41d8cd98f00b204e9800998ecf8427e.json';
-
+        $jsonFilepath = $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9.json';
         $this->assertFileExists($jsonFilepath);
 
         // get meta file
