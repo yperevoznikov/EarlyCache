@@ -1,41 +1,37 @@
-<?php
+<?php namespace YPEarlyCache;
 
-namespace YPEarlyCache;
+use YPEarlyCache\Config\PhpRequiredConfig;
 
-/**
- * 	@covers \YPEarlyCache\Config
- * 	@covers \YPEarlyCache\KohanaConfig
- */
-class KohanaConfigTest extends \PHPUnit_Framework_TestCase {
+class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @var KohanaConfig
+     * @var PhpRequiredConfig
      */
     private $cfg1;
 
 	/**
-	 * @var KohanaConfig
+	 * @var PhpRequiredConfig
 	 */
 	private $cfg2;
 
 	/**
-	 * @var KohanaConfig
+	 * @var PhpRequiredConfig
 	 */
 	private $cfg3;
 
     public function setUp(){
-        $this->cfg1 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-1.php');
-		$this->cfg2 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-2.php');
-		$this->cfg3 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-3.php');
+        $this->cfg1 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
+		$this->cfg2 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-2.php');
+		$this->cfg3 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-3.php');
     }
 
     /**
-     * @cover KohanaConfig::__construct
-     * @cover KohanaConfig::checkRequiredParams
-     * @cover KohanaConfig::getConfigFileContent
+     * @cover PhpRequiredConfig::__construct
+     * @cover PhpRequiredConfig::checkRequiredParams
+     * @cover PhpRequiredConfig::getConfigFileContent
      */
     public function testConstruct(){
-        new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-1.php');
+        new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
     }
 
     public function testIsEnabled(){

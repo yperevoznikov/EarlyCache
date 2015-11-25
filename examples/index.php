@@ -5,11 +5,11 @@
 //
 use \YPEarlyCache\Factory;
 
-$manager = Factory::getManager(Factory::KOHANA, 'path\to\config.php', $_GET, $_SERVER, $_COOKIE);
+$manager = Factory::getManager('path\to\config.php');
 if (!$manager->flushCacheIfAble()) {
 
 	//
-    // TODO: generate $content, $headers, $responseCode
+    // TODO: generate $content, $headers, $responseCode here
 	//
 
     $manager->setCache($content, $headers, $responseCode);

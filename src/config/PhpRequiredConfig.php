@@ -1,8 +1,8 @@
-<?php
+<?php namespace YPEarlyCache\Config;
 
-namespace YPEarlyCache;
+use YPEarlyCache\Contracts\IConfig;
 
-class KohanaConfig extends Config {
+class PhpRequiredConfig extends BaseConfig implements IConfig {
 
     public function __construct($configPath){
         $params = $this->getConfigFileContent($configPath);
@@ -33,7 +33,7 @@ class KohanaConfig extends Config {
     private function checkRequiredParams($params, $configPath) {
         foreach ($this->requiredConfigParams as $requiredConfigParam) {
             if (!isset($params[$requiredConfigParam])) {
-                $message = "Required config param in Kohana Config missed: $requiredConfigParam\n";
+                $message = "Required config param in PHP Required Config missed: $requiredConfigParam\n";
                 $message .= "Config file: $configPath";
                 throw new \Exception($message);
             }
@@ -42,7 +42,7 @@ class KohanaConfig extends Config {
 
     private function getConfigFileContent($configPath){
         if (!file_exists($configPath)) {
-            throw new \Exception('Early cache Kohana config not found at path: ' . $configPath);
+            throw new \Exception('Early cache PHP required config not found at path: ' . $configPath);
         }
         return require($configPath);
     }

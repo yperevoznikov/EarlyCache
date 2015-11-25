@@ -1,8 +1,6 @@
-<?php
+<?php namespace YPEarlyCache\Config;
 
-namespace YPEarlyCache;
-
-abstract class Config {
+abstract class BaseConfig {
 
 	/**
 	 * @var bool
@@ -76,7 +74,8 @@ abstract class Config {
     /**
      * @return bool
      */
-    public function needMinimizeHtml(){
+    public function needMinimizeHtml()
+    {
         return $this->minimizeHtml;
     }
 
