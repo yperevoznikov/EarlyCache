@@ -1,8 +1,6 @@
-<?php
+<?php namespace YPEarlyCache\Config;
 
-namespace YPEarlyCache;
-
-abstract class Config {
+abstract class BaseConfig {
 
 	/**
 	 * @var bool
@@ -20,9 +18,14 @@ abstract class Config {
     protected $cacheDir;
 
     /**
+     * @var string
+     */
+    protected $secretCode;
+
+    /**
      * @var array
      */
-    protected $rules = '';
+    protected $rules = array();
 
     /**
      * @var array
@@ -60,6 +63,14 @@ abstract class Config {
     /**
      * @return string
      */
+    public function getSecretCode()
+    {
+        return $this->secretCode;
+    }
+
+    /**
+     * @return string
+     */
     public function getRules()
     {
         return $this->rules;
@@ -76,7 +87,8 @@ abstract class Config {
     /**
      * @return bool
      */
-    public function needMinimizeHtml(){
+    public function needMinimizeHtml()
+    {
         return $this->minimizeHtml;
     }
 

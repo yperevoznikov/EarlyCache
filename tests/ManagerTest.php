@@ -1,11 +1,12 @@
-<?php
+<?php namespace YPEarlyCache;
 
-namespace YPEarlyCache;
+use PHPUnit_Framework_TestCase;
+use YPEarlyCache\Config\PhpRequiredConfig;
 
 /**
  * 	@covers \YPEarlyCache\Manager
  */
-class ManagerTest extends \PHPUnit_Framework_TestCase {
+class ManagerTest extends PHPUnit_Framework_TestCase {
 
     private $cfg1;
     private $cfg2;
@@ -25,13 +26,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $this->delTree($this->tmpDir);
         mkdir($this->tmpDir);
     }
-    
+
     public function setUp() {
         $this->tmpDir = dirname(__FILE__) . '/data-example/cache-tmp';
         $this->deleteFilesInTmpDir();
-        $this->cfg1 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-1.php');
-        $this->cfg2 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-2.php');
-        $this->cfg3 = new KohanaConfig(dirname(__FILE__) . '/data-example/kohana-config-3.php');
+        $this->cfg1 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
+        $this->cfg2 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-2.php');
+        $this->cfg3 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-3.php');
     }
 
     public function tearDown() {
@@ -77,6 +78,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         // check that cache was created: cache files + 2 virtual (".", "..") files
         $this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));
 
+    }
+
+    public function testFlushCacheIfAble()
+    {
+        //$envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+        //    ->disableOriginalConstructor()
+        //    ->getMock();
+		//
+        //$mgr = new Manager($this->cfg1, $envMock);
+        //$mgr->flushCacheIfAble();
     }
 
     public function dataProviderTestSetCache(){

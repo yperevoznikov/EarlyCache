@@ -1,6 +1,6 @@
-<?php
+<?php namespace YPEarlyCache;
 
-namespace YPEarlyCache;
+use YPEarlyCache\Contracts\IConfig;
 
 class Manager {
 
@@ -26,7 +26,7 @@ class Manager {
      */
     private $cacheRule = null;
 
-    public function __construct(Config $config, Environment $env){
+    public function __construct(IConfig $config, Environment $env){
         $this->config = $config;
         $this->env = $env;
     }
@@ -70,6 +70,8 @@ class Manager {
 		if ($this->config->isDebug()) {
 			$content = $this->addDebugInfo($content, $meta);
 		}
+
+        $this->env->setResponseCode($meta->code);
 
         $this->env->printToOutput($content);
         $this->env->finishOutput();

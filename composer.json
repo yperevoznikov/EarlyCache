@@ -1,21 +1,27 @@
 {
     "name": "yperevoznikov/earlycache",
-    "description": "Implements early cache for web applications without dependencies",
+    "description": "Implements early cache for web apps without dependencies. Caches entire page with headers and response code",
+    "keywords": ["cache", "page cache"],
+    "homepage": "https://github.com/yperevoznikov/EarlyCache",
     "type": "Library",
     "license": "MIT",
     "authors": [
         {
             "name": "Yuriy Perevoznikov",
-            "email": "yuriless@gmail.com"
+            "email": "yuriless@gmail.com",
+            "homepage": "http://yperevoznikov.com"
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
-    "require-dev": {
-      "phpunit/phpunit": "~4.5"
+    "require": {
+        "php": ">=5.3",
+        "symfony/yaml": "*"
     },
+    "require-dev": {},
     "autoload": {
-      "psr-4": {"YPEarlyCache\\": ["src", "src/config"]}
+      "psr-4": {
+          "YPEarlyCache\\": ["src"]
+      }
     },
     "autoload-dev": {
       "psr-4": {"YPEarlyCache\\": "tests"}

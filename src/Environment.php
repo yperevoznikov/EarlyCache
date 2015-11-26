@@ -1,6 +1,4 @@
-<?php
-
-namespace YPEarlyCache;
+<?php namespace YPEarlyCache;
 
 class Environment
 {
@@ -13,6 +11,11 @@ class Environment
 
     public function setHeader($value){
         header($value);
+    }
+
+    public function setResponseCode($code)
+    {
+        http_response_code((int)$code);
     }
 
     public function printToOutput($content){

@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "debug": true,
+  "cacheDir": "data-example/cache-tmp",
+  "cookieNoCache": ["authautologin-1"],
+  "minimizeHtml": true,
+  "secretCode": "secret-code-1",
+  "rules": [
+    {
+      "rule": "exact",
+      "cachetime": 180,
+      "value": "page"
+    },
+    {
+      "rule": "regexp",
+      "cachetime": 60,
+      "value": "#^/$#"
+    },
+    {
+      "rule": "startswith",
+      "cachetime": 0,
+      "value": "/page"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "enabled": false,
+  "debug": false,
+  "cacheDir": "other-directory",
+  "cookieNoCache": [
+    "authautologin-2",
+    "authautologin-3"
+  ],
+  "minimizeHtml": false,
+  "secretCode": "secret-code-2",
+  "rules": [
+    {
+      "rule": "exact",
+      "cachetime": 180,
+      "value": "page"
+    },
+    {
+      "rule": "regexp",
+      "cachetime": 60,
+      "value": "#^/$#"
+    },
+    {
+      "rule": "startswith",
+      "cachetime": 0,
+      "value": "/page"
+    },
+    {
+      "rule": "exact",
+      "cachetime": 180,
+      "value": "page"
+    },
+    {
+      "rule": "regexp",
+      "cachetime": 60,
+      "value": "#^/$#"
+    },
+    {
+      "rule": "startswith",
+      "cachetime": 0,
+      "value": "/page"
+    }
+  ]
+}
