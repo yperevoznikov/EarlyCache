@@ -1,6 +1,4 @@
-<?php
-
-namespace YPEarlyCache;
+<?php namespace YPEarlyCache;
 
 class Environment
 {

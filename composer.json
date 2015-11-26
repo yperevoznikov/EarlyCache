@@ -13,10 +13,14 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
+    "require": {
+        "symfony/yaml": "*"
+    },
     "require-dev": {},
     "autoload": {
-      "psr-4": {"YPEarlyCache\\": ["src", "src/config"]}
+      "psr-4": {
+          "YPEarlyCache\\": ["src"]
+      }
     },
     "autoload-dev": {
       "psr-4": {"YPEarlyCache\\": "tests"}

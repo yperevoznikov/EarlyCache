@@ -1,0 +1,11 @@
+earlyCache:
+ enabled: true
+ debug: true
+ cacheDir: "data-example/cache-tmp"
+ cookieNoCache: "authautologin-1"
+ minimizeHtml: true
+ secretCode: "secret-code-1"
+ rules:
+  - {exact: "page", cachetime: 180}
+  - {regexp: "#^/$#", cachetime: 60}
+  - {startswith: "/page", cachetime: 0}

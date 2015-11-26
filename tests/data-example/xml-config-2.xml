@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<earlyCache>
+    <enabled>false</enabled>
+    <debug>false</debug>
+    <cacheDir>other-directory</cacheDir>
+    <cookieNoCache>
+        <cookieName>authautologin-2</cookieName>
+        <cookieName>authautologin-3</cookieName>
+    </cookieNoCache>
+    <minimizeHtml>false</minimizeHtml>
+    <secretCode>secret-code-2</secretCode>
+    <rules>
+        <exact cachetime="180">page</exact>
+        <regexp cachetime="60">#^/$#</regexp>
+        <startswith cachetime="0">/page</startswith>
+        <exact cachetime="180">page</exact>
+        <regexp cachetime="60">#^/$#</regexp>
+        <startswith cachetime="0">/page</startswith>
+    </rules>
+</earlyCache>
