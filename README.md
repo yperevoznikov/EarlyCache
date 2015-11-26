@@ -1,4 +1,4 @@
-# Early Cache PHP module
+# Early Cache PHP module ![Travis](https://travis-ci.org/yperevoznikov/EarlyCache.svg?branch=develop)
 Early stage cache implementation without dependencies for fast web app response. 
 Caches page content with headers and response code.
 
