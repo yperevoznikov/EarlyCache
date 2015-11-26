@@ -1,12 +1,15 @@
 {
     "name": "yperevoznikov/earlycache",
-    "description": "Implements early cache for web applications without dependencies",
+    "description": "Implements early cache for web apps without dependencies. Caches entire page with headers and response code",
+    "keywords": ["cache", "page cache"],
+    "homepage": "https://github.com/yperevoznikov/EarlyCache",
     "type": "Library",
     "license": "MIT",
     "authors": [
         {
             "name": "Yuriy Perevoznikov",
-            "email": "yuriless@gmail.com"
+            "email": "yuriless@gmail.com",
+            "homepage": "http://yperevoznikov.com"
         }
     ],
     "minimum-stability": "stable",
