@@ -19,7 +19,7 @@
     "require-dev": {},
     "autoload": {
       "psr-4": {
-          "YPEarlyCache\\": ["src"]
+          "YPEarlyCache\\": ["src"],
       }
     },
     "autoload-dev": {

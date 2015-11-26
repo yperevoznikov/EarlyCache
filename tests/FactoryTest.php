@@ -1,6 +1,6 @@
 <?php namespace YPEarlyCache;
 
-use YPEarlyCache\Config\ArrayConfig;
+use \YPEarlyCache\Config\ArrayConfig;
 
 /**
  * 	@covers \YPEarlyCache\Factory
