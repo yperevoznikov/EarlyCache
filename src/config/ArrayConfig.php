@@ -1,6 +1,7 @@
 <?php namespace YPEarlyCache\Config;
 
 use YPEarlyCache\Contracts\IConfig;
+use YPEarlyCache\Exception\ConfigWrongException;
 
 class ArrayConfig extends BaseConfig implements IConfig
 {
@@ -34,7 +35,7 @@ class ArrayConfig extends BaseConfig implements IConfig
 		foreach ($this->requiredConfigParams as $requiredConfigParam) {
 			if (!isset($params[$requiredConfigParam])) {
 				$message = "Required config param in PHP Required Config missed: $requiredConfigParam\n";
-				throw new \Exception($message);
+				throw new ConfigWrongException($message);
 			}
 		}
 	}

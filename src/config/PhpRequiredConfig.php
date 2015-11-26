@@ -1,6 +1,8 @@
 <?php namespace YPEarlyCache\Config;
 
 use YPEarlyCache\Contracts\IConfig;
+use YPEarlyCache\Exception\ConfigNotExistedException;
+use YPEarlyCache\Exception\ConfigWrongException;
 
 class PhpRequiredConfig extends BaseConfig implements IConfig {
 
@@ -35,14 +37,14 @@ class PhpRequiredConfig extends BaseConfig implements IConfig {
             if (!isset($params[$requiredConfigParam])) {
                 $message = "Required config param in PHP Required Config missed: $requiredConfigParam\n";
                 $message .= "Config file: $configPath";
-                throw new \Exception($message);
+                throw new ConfigWrongException($message);
             }
         }
     }
 
     private function getConfigFileContent($configPath){
         if (!file_exists($configPath)) {
-            throw new \Exception('Early cache PHP required config not found at path: ' . $configPath);
+            throw new ConfigNotExistedException('Early cache PHP required config not found at path: ' . $configPath);
         }
         return require($configPath);
     }

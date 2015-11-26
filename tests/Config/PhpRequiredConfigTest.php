@@ -1,11 +1,12 @@
 <?php namespace YPEarlyCache\Config;
 
-class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
+class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase
+{
 
-    /**
-     * @var PhpRequiredConfig
-     */
-    private $cfg1;
+	/**
+	 * @var PhpRequiredConfig
+	 */
+	private $cfg1;
 
 	/**
 	 * @var PhpRequiredConfig
@@ -17,48 +18,72 @@ class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
 	 */
 	private $cfg3;
 
-    public function setUp(){
-        $this->cfg1 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
+	public function setUp()
+	{
+		$this->cfg1 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
 		$this->cfg2 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-2.php');
 		$this->cfg3 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-3.php');
-    }
+	}
 
-    /**
-     * @cover PhpRequiredConfig::__construct
-     * @cover PhpRequiredConfig::checkRequiredParams
-     * @cover PhpRequiredConfig::getConfigFileContent
-     */
-    public function testConstruct(){
-        new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
-    }
+	/**
+	 * @cover PhpRequiredConfig::__construct
+	 * @cover PhpRequiredConfig::checkRequiredParams
+	 * @cover PhpRequiredConfig::getConfigFileContent
+	 */
+	public function testConstruct()
+	{
+		new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
+	}
 
-    public function testIsEnabled(){
-        $this->assertTrue($this->cfg1->isEnabled());
-        $this->assertFalse($this->cfg2->isEnabled());
-    }
+	public function testIsEnabled()
+	{
+		$this->assertTrue($this->cfg1->isEnabled());
+		$this->assertFalse($this->cfg2->isEnabled());
+	}
 
-    public function testGetRules(){
-        $this->assertTrue(is_array($this->cfg1->getRules()));
-    }
+	public function testGetRules()
+	{
+		$this->assertTrue(is_array($this->cfg1->getRules()));
+	}
 
-    public function testGetCacheDir(){
-        $this->assertTrue(is_string($this->cfg1->getCacheDir()));
-    }
+	public function testGetCacheDir()
+	{
+		$this->assertTrue(is_string($this->cfg1->getCacheDir()));
+	}
 
-    public function testGetCookieNoCache() {
-        $this->assertTrue(is_array($this->cfg1->getCookieNoCache()));
-        $this->assertTrue(is_array($this->cfg2->getCookieNoCache()));
-    }
+	public function testGetCookieNoCache()
+	{
+		$this->assertTrue(is_array($this->cfg1->getCookieNoCache()));
+		$this->assertTrue(is_array($this->cfg2->getCookieNoCache()));
+	}
 
-    public function testNeedMinimizeHtml(){
-        $this->assertTrue($this->cfg1->needMinimizeHtml());
-        $this->assertFalse($this->cfg2->needMinimizeHtml());
-    }
+	public function testNeedMinimizeHtml()
+	{
+		$this->assertTrue($this->cfg1->needMinimizeHtml());
+		$this->assertFalse($this->cfg2->needMinimizeHtml());
+	}
 
-	public function testIsDebug(){
+	public function testIsDebug()
+	{
 		$this->assertTrue($this->cfg1->isDebug());
 		$this->assertFalse($this->cfg2->isDebug());
 		$this->assertFalse($this->cfg3->isDebug());
+	}
+
+	/**
+	 * @expectedException \YPEarlyCache\Exception\ConfigNotExistedException
+	 */
+	public function testOpenNotExistedConfigFile()
+	{
+		new PhpRequiredConfig("not-existed-file.php");
+	}
+
+	/**
+	 * @expectedException \YPEarlyCache\Exception\ConfigWrongException
+	 */
+	public function testOpenWrongConfigFile()
+	{
+		new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-wrong-1.php');
 	}
 
 }

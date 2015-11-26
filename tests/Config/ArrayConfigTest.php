@@ -57,4 +57,13 @@ class ArrayConfigTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($this->cfg3->isDebug());
 	}
 
+	/**
+	 * @expectedException \YPEarlyCache\Exception\ConfigWrongException
+	 */
+	public function testOpenWrongConfigFile()
+	{
+		$arr1 = require(dirname(dirname(__FILE__)) . '/data-example/php-require-config-wrong-1.php');
+		$this->cfg1 = new ArrayConfig($arr1);
+	}
+
 }

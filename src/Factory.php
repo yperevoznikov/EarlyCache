@@ -1,10 +1,10 @@
 <?php namespace YPEarlyCache;
 
+use YPEarlyCache\Config\ArrayConfig;
 use YPEarlyCache\Config\JsonConfig;
 use YPEarlyCache\Config\PhpRequiredConfig;
 use YPEarlyCache\Config\XmlConfig;
 use YPEarlyCache\Config\YamlConfig;
-use YPEarlyCache\Contracts\IConfig;
 
 class Factory
 {
@@ -55,10 +55,10 @@ class Factory
                 $manager = new Manager(new YamlConfig($source), $env);
                 break;
             case self::CONFIG_ARRAY:
-                $manager = new Manager(new YamlConfig($source), $env);
+                $manager = new Manager(new ArrayConfig($source), $env);
                 break;
             case self::CONFIG_CONFIG_OBJECT:
-                $manager = new Manager(new $source, $env);
+                $manager = new Manager($source, $env);
                 break;
         }
 
@@ -73,19 +73,21 @@ class Factory
     {
         $configType = "";
 
-        $fileExt = pathinfo($source, PATHINFO_EXTENSION);
-        if ($source instanceof IConfig) {
+        if (is_subclass_of($source, '\YPEarlyCache\Contracts\IConfig')) {
             $configType = self::CONFIG_CONFIG_OBJECT;
         } elseif (is_array($source)) {
             $configType = self::CONFIG_ARRAY;
-        } elseif ("php" == $fileExt) {
-            $configType = self::CONFIG_PHP_REQUIRED;
-        } elseif ("json" == $fileExt) {
-            $configType = self::CONFIG_JSON;
-        } elseif ("xml" == $fileExt) {
-            $configType = self::CONFIG_XML;
-        } elseif ("yaml" == $fileExt) {
-            $configType = self::CONFIG_YAML;
+        } else {
+            $fileExt = pathinfo($source, PATHINFO_EXTENSION);
+            if ("php" == $fileExt) {
+                $configType = self::CONFIG_PHP_REQUIRED;
+            } elseif ("json" == $fileExt) {
+                $configType = self::CONFIG_JSON;
+            } elseif ("xml" == $fileExt) {
+                $configType = self::CONFIG_XML;
+            } elseif ("yaml" == $fileExt) {
+                $configType = self::CONFIG_YAML;
+            }
         }
 
         return $configType;
