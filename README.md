@@ -16,5 +16,5 @@ composer require yperevoznikov/earlycache
 To run all unit tests, in component directory (where this file is placed) 
 copy `phpunit.xml.dist` to `phpunit.xml` and run in command line:  
 ```  
-php bin/phpunit.phar
+php phpunit.phar
 ```

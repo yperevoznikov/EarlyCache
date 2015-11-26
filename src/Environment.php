@@ -13,6 +13,11 @@ class Environment
         header($value);
     }
 
+    public function setResponseCode($code)
+    {
+        http_response_code((int)$code);
+    }
+
     public function printToOutput($content){
         echo $content;
     }

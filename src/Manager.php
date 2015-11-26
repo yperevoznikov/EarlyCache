@@ -71,6 +71,8 @@ class Manager {
 			$content = $this->addDebugInfo($content, $meta);
 		}
 
+        $this->env->setResponseCode($meta->code);
+
         $this->env->printToOutput($content);
         $this->env->finishOutput();
 

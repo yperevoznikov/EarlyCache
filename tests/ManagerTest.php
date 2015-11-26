@@ -1,11 +1,12 @@
 <?php namespace YPEarlyCache;
 
+use PHPUnit_Framework_TestCase;
 use YPEarlyCache\Config\PhpRequiredConfig;
 
 /**
  * 	@covers \YPEarlyCache\Manager
  */
-class ManagerTest extends \PHPUnit_Framework_TestCase {
+class ManagerTest extends PHPUnit_Framework_TestCase {
 
     private $cfg1;
     private $cfg2;
@@ -25,7 +26,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         $this->delTree($this->tmpDir);
         mkdir($this->tmpDir);
     }
-    
+
     public function setUp() {
         $this->tmpDir = dirname(__FILE__) . '/data-example/cache-tmp';
         $this->deleteFilesInTmpDir();
@@ -77,6 +78,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
         // check that cache was created: cache files + 2 virtual (".", "..") files
         $this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));
 
+    }
+
+    public function testFlushCacheIfAble()
+    {
+        //$envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+        //    ->disableOriginalConstructor()
+        //    ->getMock();
+		//
+        //$mgr = new Manager($this->cfg1, $envMock);
+        //$mgr->flushCacheIfAble();
     }
 
     public function dataProviderTestSetCache(){
