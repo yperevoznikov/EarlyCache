@@ -1,0 +1,14 @@
+earlyCache:
+ enabled: false
+ debug: false
+ cacheDir: "other-directory"
+ cookieNoCache: ["authautologin-2", "authautologin-3"]
+ minimizeHtml: false
+ secretCode: "secret-code-2"
+ rules:
+  - {exact: "page", cachetime: 180}
+  - {regexp: "#^/$#", cachetime: 60}
+  - {startswith: "/page", cachetime: 0}
+  - {exact: "page", cachetime: 180}
+  - {regexp: "#^/$#", cachetime: 60}
+  - {startswith: "/page", cachetime: 0}

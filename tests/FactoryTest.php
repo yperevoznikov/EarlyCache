@@ -5,10 +5,22 @@
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase {
 
-    public function testGetManager(){
-        $configPath = dirname(__FILE__) . '/data-example/php-require-config-1.php';
-        $mgr = Factory::getManager($configPath, Factory::CONFIG_PHP_REQUIRED, array(), array(), array());
+    /**
+     * @dataProvider dataProviderTestGetManagerDiffConfigs
+     */
+    public function testGetManagerDiffConfigs($configPath){
+        $mgr = Factory::getManager($configPath);
         $this->assertInstanceOf('\YPEarlyCache\Manager', $mgr);
+    }
+
+    public function dataProviderTestGetManagerDiffConfigs()
+    {
+        $configsBase = dirname(__FILE__) . '/data-example/';
+        return array(
+            array($configsBase . 'php-require-config-1.php'),
+            array($configsBase . 'xml-config-1.xml'),
+            array($configsBase . 'yaml-config-1.yaml'),
+        );
     }
 
 }
