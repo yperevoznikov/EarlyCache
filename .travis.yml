@@ -9,4 +9,6 @@ php:
   - 7.0
   - hhvm
 
-script: phpunit --configuration phpunit.travis.xml --coverage-text
+script:
+  - composer update
+  - phpunit --configuration phpunit.travis.xml --coverage-text
