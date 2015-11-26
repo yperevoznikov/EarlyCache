@@ -69,7 +69,7 @@ class Factory
      * @param string|array $source
      * @return string
      */
-    private function getConfigTypeByFilename($source)
+    private static function getConfigTypeByFilename($source)
     {
         $configType = "";
 

@@ -11,9 +11,6 @@ class JsonConfig extends BaseConfig implements IConfig
 
 		$jsonObj = json_decode($jsonStr);
 
-		//var_dump($jsonObj);
-		//die;
-
 		$this->enabled = 'true' == $jsonObj->enabled;
 		$this->debug = 'true' == $jsonObj->enabled;
 		$this->cacheDir = (string)$jsonObj->cacheDir;

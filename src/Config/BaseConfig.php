@@ -25,7 +25,7 @@ abstract class BaseConfig {
     /**
      * @var array
      */
-    protected $rules = [];
+    protected $rules = array();
 
     /**
      * @var array
