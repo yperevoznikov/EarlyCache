@@ -1,23 +1,26 @@
 <?php namespace YPEarlyCache\Config;
 
-class YamlConfigTest extends \PHPUnit_Framework_TestCase {
+class JsonConfigTest extends \PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var YamlConfig
+	 * @var JsonConfig
 	 */
 	private $config1;
 
 	/**
-	 * @var YamlConfig
+	 * @var JsonConfig
 	 */
 	private $config2;
 
 	public function setUp()
 	{
-		$this->config1 = new YamlConfig(dirname(dirname(__FILE__)) . '/data-example/yaml-config-1.yaml');
-		$this->config2 = new YamlConfig(dirname(dirname(__FILE__)) . '/data-example/yaml-config-2.yaml');
+		$this->config1 = new JsonConfig(dirname(dirname(__FILE__)) . '/data-example/json-config-1.json');
+		$this->config2 = new JsonConfig(dirname(dirname(__FILE__)) . '/data-example/json-config-2.json');
 	}
 
+	/**
+	 * @covers YPEarlyCache\Config\XmlConfig::__construct
+	 */
 	public function testIsEnabled()
 	{
 		$this->assertTrue($this->config1->isEnabled());

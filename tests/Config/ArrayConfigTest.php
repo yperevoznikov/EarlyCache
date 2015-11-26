@@ -3,17 +3,17 @@
 class ArrayConfigTest extends \PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var PhpRequiredConfig
+	 * @var ArrayConfig
 	 */
 	private $cfg1;
 
 	/**
-	 * @var PhpRequiredConfig
+	 * @var ArrayConfig
 	 */
 	private $cfg2;
 
 	/**
-	 * @var PhpRequiredConfig
+	 * @var ArrayConfig
 	 */
 	private $cfg3;
 
