@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<earlyCache>
+    <enabled>true</enabled>
+    <debug>true</debug>
+    <cacheDir>data-example/cache-tmp</cacheDir>
+    <cookieNoCache>
+        <cookieName>authautologin-1</cookieName>
+    </cookieNoCache>
+    <minimizeHtml>true</minimizeHtml>
+    <secretCode>secret-code-1</secretCode>
+    <rules>
+        <exact cachetime="180">page</exact>
+        <regexp cachetime="60">#^/$#</regexp>
+        <startswith cachetime="0">/page</startswith>
+    </rules>
+</earlyCache>

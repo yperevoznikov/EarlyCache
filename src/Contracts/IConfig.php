@@ -24,6 +24,11 @@ interface IConfig
 	public function getRules();
 
 	/**
+	 * @return string
+	 */
+	public function getSecretCode();
+
+	/**
 	 * @return array
 	 */
     public function getCookieNoCache();

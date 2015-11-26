@@ -1,6 +1,4 @@
-<?php namespace YPEarlyCache;
-
-use YPEarlyCache\Config\PhpRequiredConfig;
+<?php namespace YPEarlyCache\Config;
 
 class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
 
@@ -20,9 +18,9 @@ class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
 	private $cfg3;
 
     public function setUp(){
-        $this->cfg1 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
-		$this->cfg2 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-2.php');
-		$this->cfg3 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-3.php');
+        $this->cfg1 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
+		$this->cfg2 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-2.php');
+		$this->cfg3 = new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-3.php');
     }
 
     /**
@@ -31,7 +29,7 @@ class PhpRequiredConfigTest extends \PHPUnit_Framework_TestCase {
      * @cover PhpRequiredConfig::getConfigFileContent
      */
     public function testConstruct(){
-        new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
+        new PhpRequiredConfig(dirname(dirname(__FILE__)) . '/data-example/php-require-config-1.php');
     }
 
     public function testIsEnabled(){

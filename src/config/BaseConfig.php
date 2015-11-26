@@ -18,9 +18,14 @@ abstract class BaseConfig {
     protected $cacheDir;
 
     /**
+     * @var string
+     */
+    protected $secretCode;
+
+    /**
      * @var array
      */
-    protected $rules = '';
+    protected $rules = [];
 
     /**
      * @var array
@@ -53,6 +58,14 @@ abstract class BaseConfig {
     public function getCacheDir()
     {
         return $this->cacheDir;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecretCode()
+    {
+        return $this->secretCode;
     }
 
     /**
