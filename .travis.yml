@@ -10,5 +10,4 @@ php:
 
 script:
   - composer update
-  - chmod -R 777 tests/data-example/cache-tmp
   - phpunit --configuration phpunit.travis.xml --coverage-text
