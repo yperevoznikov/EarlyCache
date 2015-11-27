@@ -73,11 +73,7 @@ class Factory
     {
         $configType = "";
 
-        if (is_subclass_of($source, '\YPEarlyCache\Contracts\IConfig')) {
-            $configType = self::CONFIG_CONFIG_OBJECT;
-        } elseif (is_array($source)) {
-            $configType = self::CONFIG_ARRAY;
-        } else {
+        if (is_string($source)) {
             $fileExt = pathinfo($source, PATHINFO_EXTENSION);
             if ("php" == $fileExt) {
                 $configType = self::CONFIG_PHP_REQUIRED;
@@ -87,6 +83,12 @@ class Factory
                 $configType = self::CONFIG_XML;
             } elseif ("yaml" == $fileExt) {
                 $configType = self::CONFIG_YAML;
+            }
+        } else {
+            if (is_subclass_of($source, '\YPEarlyCache\Contracts\IConfig')) {
+                $configType = self::CONFIG_CONFIG_OBJECT;
+            } elseif (is_array($source)) {
+                $configType = self::CONFIG_ARRAY;
             }
         }
 

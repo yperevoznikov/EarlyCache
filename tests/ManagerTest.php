@@ -23,7 +23,9 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
     }
 
     private function deleteFilesInTmpDir(){
-        $this->delTree($this->tmpDir);
+        if (file_exists($this->tmpDir)) {
+            $this->delTree($this->tmpDir);
+        }
         mkdir($this->tmpDir);
     }
 

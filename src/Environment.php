@@ -2,6 +2,7 @@
 
 class Environment
 {
+    const DEFAULT_RESPONSE_CODE = 200;
 
     public function __construct(array $get, array $server, array $cookie){
         $this->get = $get;
@@ -15,7 +16,16 @@ class Environment
 
     public function setResponseCode($code)
     {
-        http_response_code((int)$code);
+        if (self::DEFAULT_RESPONSE_CODE != $code) {
+            return;
+        }
+
+        // For 4.3.0 <= PHP <= 5.4.0
+        if (function_exists('http_response_code')) {
+            http_response_code((int)$code);
+        } else {
+            header('X-PHP-Response-Code: ' . $code, true, $code);
+        }
     }
 
     public function printToOutput($content){
