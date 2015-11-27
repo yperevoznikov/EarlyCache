@@ -1,6 +1,8 @@
 <?php namespace YPEarlyCache;
 
 use YPEarlyCache\Contracts\IConfig;
+use YPEarlyCache\Exception\CacheDirectoryNotAvailableException;
+use YPEarlyCache\Exception\WrongRuleException;
 
 class Manager {
 
@@ -31,17 +33,17 @@ class Manager {
         $this->env = $env;
     }
 
-    public function deleteAllCache() {
-        $files = scandir($this->config->getCacheDir());
+    private function delTree($dir) {
+        $files = array_diff(scandir($dir), array('.','..'));
         foreach ($files as $file) {
-            if (in_array($file, array('.', '..'))) {
-                continue;
-            }
-            if (is_dir($this->config->getCacheDir() . '/' . $file)) {
-                continue;
-            }
-            unlink($this->config->getCacheDir() . DIRECTORY_SEPARATOR . $file);
+            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
         }
+        return rmdir($dir);
+    }
+
+    public function deleteAllCache() {
+        $this->delTree($this->config->getCacheDir());
+        mkdir($this->config->getCacheDir());
     }
 
     public function flushCacheIfAble() {
@@ -58,13 +60,9 @@ class Manager {
         $rawMeta = file_get_contents($this->getCacheFilepath() . self::EXT_META);
         $meta = json_decode($rawMeta);
 
-        if (false === $content || false === $meta) {
-            return false;
-        }
-
 		$this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
-		foreach ($meta->headers as $headerName => $headerValue) {
-			$this->env->setHeader($headerName . ': ' . $headerValue);
+		foreach ($meta->headers as $header) {
+			$this->env->setHeader($header->name . ': ' . $header->value);
 		}
 
 		if ($this->config->isDebug()) {
@@ -87,12 +85,11 @@ class Manager {
 
         $filepath = $this->getCacheFilepath();
 
+        $content = $inContent;
         if ($this->config->needMinimizeHtml()) {
-            $content = str_replace("\t", '', $inContent);
+            $content = str_replace("\t", '', $content);
             $content = preg_replace("|\n *|", " ", $content);
             $content = preg_replace("| +|", ' ', $content);
-        } else {
-            $content = $inContent;
         }
 
         $hash = $this->getHashFromUrl();
@@ -114,10 +111,11 @@ class Manager {
 
         // save content file and meta file
         if (
-			false === file_put_contents($filepath, $content) ||
-			false === file_put_contents($filepath . self::EXT_META, json_encode($meta))
+			false === @file_put_contents($filepath, $content) ||
+			false === @file_put_contents($filepath . self::EXT_META, json_encode($meta))
 		) {
-			throw new \Exception('Could not write early cache to directory ' . $this->config->getCacheDir());
+            $exceptionMes = 'Could not write early cache to directory ' . $this->config->getCacheDir();
+            throw new CacheDirectoryNotAvailableException($exceptionMes);
 		}
     }
 
@@ -127,17 +125,20 @@ class Manager {
 
     private function canGetCache() {
 
+        $allowedNegativeValue = array('0', 'false');
+        if (in_array($this->env->get('ec'), $allowedNegativeValue) ||
+            in_array($this->env->get('early_cache'), $allowedNegativeValue)
+        ) {
+            return false;
+        }
+
         $filepath = $this->getCacheFilepath();
         if (!file_exists($filepath) || !file_exists($filepath . self::EXT_META)) {
             return false;
         }
 
-        if (0 == $this->getCacheTime()) {
-            return false;
-        }
-
         $modificationTimestamp = filemtime($filepath);
-        if (time() - $modificationTimestamp > $this->getCacheTime()) {
+        if ($this->env->getTime() - $modificationTimestamp > $this->getCacheTime()) {
             @unlink($filepath);
             @unlink($filepath . self::EXT_META);
             return false;
@@ -148,7 +149,10 @@ class Manager {
 
     private function needSetCache() {
 
-        if (false === $this->env->get('ec') || false === $this->env->get('early_cache')) {
+        $allowedNegativeValue = array('0', 'false');
+        if (in_array($this->env->get('ec'), $allowedNegativeValue) ||
+            in_array($this->env->get('early_cache'), $allowedNegativeValue)
+        ) {
             return false;
         }
 
@@ -170,10 +174,6 @@ class Manager {
 
         $cacheRule = $this->getCacheRule();
 
-        if (!isset($cacheRule['cachetime'])) {
-            throw new \Exception('No `cachetime` defined for rule in EarlyCache rules: ' . print_r($cacheRule, true));
-        }
-
         return $cacheRule['cachetime'];
     }
 
@@ -182,11 +182,11 @@ class Manager {
             foreach ($this->config->getRules() as $rule) {
 
 				if (!is_array($rule)) {
-					throw new \Exception('All rules have to be an array type');
+					throw new WrongRuleException('All rules have to be an array type');
 				}
 
 				if (!isset($rule['cachetime'])) {
-					throw new \Exception('No `cachetime` in rule: ' . print_r($rule, true));
+					throw new WrongRuleException('No `cachetime` in rule: ' . print_r($rule, true));
 				}
 
 				$availableMatches = array('exact', 'startswith', 'regexp',);
@@ -197,7 +197,7 @@ class Manager {
                 } elseif (isset($rule['regexp'])) {
                     $matchedRule = (bool)preg_match($rule['regexp'], $this->env->getUri());
                 } else {
-					throw new \Exception('A rule does not have available match: ' . implode(', ', $availableMatches));
+					throw new WrongRuleException('A rule does not have available match: ' . implode(', ', $availableMatches));
 				}
 
                 if ($matchedRule) {

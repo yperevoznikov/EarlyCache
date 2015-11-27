@@ -1,8 +1,7 @@
 <?php
 
-// Wrong: no required `enabled` option in config
-
 return array(
+	'enabled' => true,
 	'debug' => true,
 	'cache_dir' => dirname(__FILE__) . '/cache-tmp',
 	'cookie_no_cache' => 'authautologin',
@@ -10,9 +9,7 @@ return array(
 	'secret_code' => '123',
 
 	'rules' => array(
-		array('exact' => 'page', 'cachetime' => 180),
-		array('regexp' => '#^/$#', 'cachetime' => 60),
-		array('startswith' => '/page', 'cachetime' => 0),
+		'some-string', // Wrong: rule must be an array
 	),
 
 );

@@ -44,6 +44,13 @@ class Environment
 		// @codeCoverageIgnoreEnd
 	}
 
+	public function getTime()
+	{
+		// @codeCoverageIgnoreStart
+		return time();
+		// @codeCoverageIgnoreEnd
+	}
+
 	public function hasCookieWithName($name)
 	{
 		return isset($this->cookie[$name]);
