@@ -16,7 +16,7 @@ class Environment
 
     public function setResponseCode($code)
     {
-        if (self::DEFAULT_RESPONSE_CODE != $code) {
+        if (self::DEFAULT_RESPONSE_CODE == $code) {
             return;
         }
 
