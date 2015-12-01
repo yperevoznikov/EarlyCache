@@ -6,9 +6,7 @@ php:
   - 5.5
   - 5.6
   - 7.0
-  - hhvm
 
 script:
   - composer update
-  - chmod -R 777 tests/data-example/cache-tmp
   - phpunit --configuration phpunit.travis.xml --coverage-text

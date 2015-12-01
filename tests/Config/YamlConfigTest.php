@@ -15,7 +15,7 @@ class YamlConfigTest extends \PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		$this->config1 = new YamlConfig(dirname(dirname(__FILE__)) . '/data-example/yaml-config-1.yaml');
-		$this->config2 = new YamlConfig(dirname(dirname(__FILE__)) . '/data-example/yaml-config-2.yaml');
+		$this->config2 = new YamlConfig(dirname(dirname(__FILE__)) . '/data-example/yaml-config-2.yml');
 	}
 
 	public function testIsEnabled()

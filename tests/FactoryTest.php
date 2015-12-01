@@ -24,6 +24,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
             array($configsBase . 'php-require-config-1.php'),
             array($configsBase . 'xml-config-1.xml'),
             array($configsBase . 'yaml-config-1.yaml'),
+            array($configsBase . 'yaml-config-2.yml'),
             array($configsBase . 'json-config-1.json'),
             array($objConfig),
 			array($arrConfig)

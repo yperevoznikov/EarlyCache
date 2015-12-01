@@ -19,7 +19,7 @@ interface IConfig
 	public function getCacheDir();
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public function getRules();
 

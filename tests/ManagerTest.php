@@ -13,6 +13,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
     private $cfg3;
 
     private $tmpDir;
+    private $cacheExamplesDir;
 
     private function delTree($dir) {
         $files = array_diff(scandir($dir), array('.','..'));
@@ -31,6 +32,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         $this->tmpDir = dirname(__FILE__) . '/data-example/cache-tmp';
+        $this->cacheExamplesDir = dirname(__FILE__) . '/data-example/cache-example-files';
         $this->deleteFilesInTmpDir();
         $this->cfg1 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-1.php');
         $this->cfg2 = new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-2.php');
@@ -45,7 +47,8 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
 
         // emulate cache creation
         file_put_contents($this->tmpDir . DIRECTORY_SEPARATOR . 'test1.txt', 'random content #1');
-        file_put_contents($this->tmpDir . DIRECTORY_SEPARATOR . 'test2.txt', 'random content #2');
+        mkdir($this->tmpDir . DIRECTORY_SEPARATOR . 'tmp');
+        file_put_contents($this->tmpDir . DIRECTORY_SEPARATOR . 'tmp/test2.txt', 'random content #2');
 
         // ensure that test files were really created: 2 created files + 2 misc ("./", "../") dirs
         $this->assertCount(4, $files = scandir($this->tmpDir));
@@ -59,43 +62,158 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
         $this->assertCount(2, $files = scandir($this->tmpDir));
     }
 
-    // public function testSetCache() {
-    //     $env = new Environment(array(), array(), array());
-    //     $mgr = new Manager($this->cfg3, $env);
-    //     $mgr->setCache('content', 'text/html', 200);
-
-    //     // check that cache was created: content file + meta file + 2 misc ("./", "../") dirs
-    //     $this->assertCount(4, $files = scandir($this->tmpDir));
-    // }
-
     /**
      * @dataProvider dataProviderTestSetCache
      */
-    public function testSetCache($get, $server, $cookie, $expectedFilesCount) {
+    public function testSetCache($cfgName, $get, $server, $cookie, $expectedFilesCount) {
+
+        $cfg = $this->{$cfgName};
 
         $env = new Environment($get, $server, $cookie);
-        $mgr = new Manager($this->cfg1, $env);
+        $mgr = new Manager($cfg, $env);
         $mgr->setCache('content', array('Content-Type' => 'text/html'), 200);
 
         // check that cache was created: cache files + 2 virtual (".", "..") files
         $this->assertCount($expectedFilesCount, $files = scandir($this->tmpDir));
+    }
 
+    public function dataProviderTestSetCache(){
+
+        return array(
+            array('cfg1', array(), array(), array(), 4),
+            array('cfg1', array(), array('REQUEST_URI'=>'random/path/1'), array(), 2),
+            array('cfg1', array('ec'=>'false'), array('REQUEST_URI'=>'/'), array(), 2),
+            array('cfg1', array('early_cache'=>'false'), array('REQUEST_URI'=>'/'), array(), 2),
+            array('cfg1', array('ec'=>'0'), array('REQUEST_URI'=>'/'), array(), 2),
+            array('cfg1', array('early_cache'=>'0'), array('REQUEST_URI'=>'/'), array(), 2),
+            array('cfg2', array(), array('REQUEST_URI'=>'/'), array(), 2),
+        );
+    }
+
+    /**
+     * @expectedException \YPEarlyCache\Exception\CacheDirectoryNotAvailableException
+     */
+    public function testSetCacheIfFilePermissionsDenied() {
+
+        // delete targer folder - to it looks like permissions denied
+        if (file_exists($this->tmpDir)) {
+            $this->delTree($this->tmpDir);
+        }
+
+        $env = new Environment(array(), array(), array());
+        $mgr = new Manager($this->cfg1, $env);
+        $mgr->setCache('content', array('Content-Type' => 'text/html'), 200);
     }
 
     public function testFlushCacheIfAble()
     {
-        //$envMock = $this->getMockBuilder('YPEarlyCache\Environment')
-        //    ->disableOriginalConstructor()
-        //    ->getMock();
-		//
-        //$mgr = new Manager($this->cfg1, $envMock);
-        //$mgr->flushCacheIfAble();
+        $envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $envMock->method('getUri')->willReturn("/");
+
+        // pretend that we have cache
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9'
+        );
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9.json',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9.json'
+        );
+        $mgr = new Manager($this->cfg1, $envMock);
+
+        // printOutput
+        $envMock->method('printToOutput')->with($this->equalTo('content'));
+
+        $mgr->flushCacheIfAble();
     }
 
-    public function dataProviderTestSetCache(){
+    public function testFlushCacheIfAbleCacheDisabled()
+    {
+        $envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $envMock->method('getUri')->willReturn("/");
+
+        // if cache is disabled
+        $mgr = new Manager($this->cfg2, $envMock);
+        $result = $mgr->flushCacheIfAble();
+        $this->assertFalse($result);
+    }
+
+    public function testFlushCacheIfAbleNoCacheFile()
+    {
+        $envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $envMock->method('getUri')->willReturn("/");
+
+        // if cache file was not found
+        $mgr = new Manager($this->cfg1, $envMock);
+        $result = $mgr->flushCacheIfAble();
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @covers \YPEarlyCache\Manager::flushCacheIfAble
+     */
+    public function testFlushCacheIfAbleObsoleteCache()
+    {
+        $twoMonthInSeconds = 86400 * 60;
+
+        $envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $envMock->method('getUri')->willReturn("/");
+        $envMock->expects($this->never())->method('printToOutput');
+        $envMock->method('getTime')->willReturn(time() + $twoMonthInSeconds);
+
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9'
+        );
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9.json',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9.json'
+        );
+
+        $mgr = new Manager($this->cfg1, $envMock);
+
+        $mgr->flushCacheIfAble();
+    }
+
+    /**
+     * @dataProvider dataProviderTestFlushCacheIfAbleDisabledByUrl
+     */
+    public function testFlushCacheIfAbleDisabledByUrl($get, $server, $cookie) {
+
+        $env = new Environment($get, $server, $cookie);
+
+        // pretend that we have cache
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9'
+        );
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9.json',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9.json'
+        );
+        $mgr = new Manager($this->cfg1, $env);
+
+        $result = $mgr->flushCacheIfAble();
+
+        $this->assertFalse($result);
+    }
+
+    public function dataProviderTestFlushCacheIfAbleDisabledByUrl()
+    {
         return array(
-            array(array(), array(), array(), 4),
-            array(array(), array('REQUEST_URI'=>'rangom/path/1'), array(), 2),
+            array(array('ec'=>'false'), array('REQUEST_URI'=>'/'), array()),
+            array(array('early_cache'=>'false'), array('REQUEST_URI'=>'/'), array()),
+            array(array('ec'=>'0'), array('REQUEST_URI'=>'/'), array()),
+            array(array('early_cache'=>'0'), array('REQUEST_URI'=>'/'), array()),
         );
     }
 
@@ -132,6 +250,41 @@ class ManagerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1, $deletedCount);
         $this->assertFileNotExists($jsonFilepath);
 
+    }
+
+    /**
+     * @expectedException \YPEarlyCache\Exception\WrongRuleException
+     * @dataProvider dataProviderTestWrongRules
+     */
+    public function testWrongRules($cfg)
+    {
+        $envMock = $this->getMockBuilder('YPEarlyCache\Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $envMock->method('getUri')->willReturn("/");
+        $mgr = new Manager($cfg, $envMock);
+
+        // pretend that we have cache
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9'
+        );
+        copy(
+            $this->cacheExamplesDir . '/6666cd76f96956469e7be39d750cc7d9.json',
+            $this->tmpDir . '/6666cd76f96956469e7be39d750cc7d9.json'
+        );
+
+        // it won't be flushed
+        $mgr->flushCacheIfAble();
+    }
+
+    public function dataProviderTestWrongRules()
+    {
+        return array(
+            array(new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-wrong-2.php')),
+            array(new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-wrong-3.php')),
+            array(new PhpRequiredConfig(dirname(__FILE__) . '/data-example/php-require-config-wrong-4.php')),
+        );
     }
 
 }

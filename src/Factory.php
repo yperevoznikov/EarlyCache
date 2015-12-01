@@ -81,7 +81,7 @@ class Factory
                 $configType = self::CONFIG_JSON;
             } elseif ("xml" == $fileExt) {
                 $configType = self::CONFIG_XML;
-            } elseif ("yaml" == $fileExt) {
+            } elseif ("yaml" == $fileExt || "yml" == $fileExt) {
                 $configType = self::CONFIG_YAML;
             }
         } else {
