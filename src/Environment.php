@@ -1,4 +1,11 @@
 <?php namespace YPEarlyCache;
+
+/**
+ * Class Environment
+ * Implements access to environment
+ *
+ * @package YPEarlyCache
+ */
 class Environment
 {
 	private $currentResponseCode = 200;
@@ -10,11 +17,22 @@ class Environment
 		$this->cookie = $cookie;
 	}
 
+	/**
+	 * Sets HTTP header
+	 * @param string $value
+	 */
 	public function setHeader($value)
 	{
 		header($value);
 	}
 
+	/**
+	 * Sets response code
+	 *
+	 * @param $code
+	 * @param bool $forceUseHeader
+	 * @return bool
+	 */
 	public function setResponseCode($code, $forceUseHeader = false)
 	{
 		if ($this->currentResponseCode == $code) {
@@ -32,11 +50,18 @@ class Environment
 		return true;
 	}
 
+	/**
+	 * Flush content to standart output
+	 * @param string $content
+	 */
 	public function printToOutput($content)
 	{
 		echo $content;
 	}
 
+	/**
+	 * Stops executing code
+	 */
 	public function finishOutput()
 	{
 		// @codeCoverageIgnoreStart
@@ -44,6 +69,10 @@ class Environment
 		// @codeCoverageIgnoreEnd
 	}
 
+	/**
+	 * Get current timestamp
+	 * @return int
+	 */
 	public function getTime()
 	{
 		// @codeCoverageIgnoreStart
@@ -51,11 +80,20 @@ class Environment
 		// @codeCoverageIgnoreEnd
 	}
 
+	/**
+	 * Check if cookie with name exists
+	 * @param string $name
+	 * @return bool
+	 */
 	public function hasCookieWithName($name)
 	{
 		return isset($this->cookie[$name]);
 	}
 
+	/**
+	 * Gets current URI path
+	 * @return string
+	 */
 	public function getUri()
 	{
 		$uri = '/';
@@ -71,6 +109,12 @@ class Environment
 		return $uri;
 	}
 
+	/**
+	 * Returns $_GET params
+	 * @param $name
+	 * @param null|mixed $default
+	 * @return null
+	 */
 	public function get($name, $default = null)
 	{
 		if (isset($this->get[$name])) {

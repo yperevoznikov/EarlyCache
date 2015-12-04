@@ -4,6 +4,12 @@ use YPEarlyCache\Contracts\IConfig;
 use YPEarlyCache\Exception\CacheDirectoryNotAvailableException;
 use YPEarlyCache\Exception\WrongRuleException;
 
+/**
+ * Class Manager
+ * Main class to manipulate with cache
+ *
+ * @package YPEarlyCache
+ */
 class Manager
 {
 

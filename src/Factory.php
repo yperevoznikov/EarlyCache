@@ -6,6 +6,12 @@ use YPEarlyCache\Config\PhpRequiredConfig;
 use YPEarlyCache\Config\XmlConfig;
 use YPEarlyCache\Config\YamlConfig;
 
+/**
+ * Class Factory
+ * Creates instance of manager
+ *
+ * @package YPEarlyCache
+ */
 class Factory
 {
 
