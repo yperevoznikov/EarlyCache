@@ -27,6 +27,19 @@ class Environment
 	}
 
 	/**
+	 * @param string $name
+	 * @return string|null
+	 */
+	public function requestHeader($name)
+	{
+		$headers = getallheaders();
+		if (isset($headers[$name])) {
+			return $headers[$name];
+		}
+		return null;
+	}
+
+	/**
 	 * Sets response code
 	 *
 	 * @param $code
