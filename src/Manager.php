@@ -72,6 +72,7 @@ class Manager
 		if (!$this->canGetCache()) {
 			if ($this->isCacheOn()) {
 				$this->etag = md5(uniqid());
+				$this->env->setHeader("ETag: {$this->etag}");
 			}
 			return false;
 		}
