@@ -80,7 +80,7 @@ class Manager
 		$rawMeta = file_get_contents($this->getCacheFilepath() . self::EXT_META);
 		$meta = json_decode($rawMeta);
 
-		if (is_string($meta->etag)) {
+		if (isset($meta->etag)) {
 			// Etag implementation
 			$requestEtag = $this->env->requestHeader('ETag');
 			if ($requestEtag == $meta->etag) {
