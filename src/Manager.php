@@ -4,6 +4,12 @@ use YPEarlyCache\Contracts\IConfig;
 use YPEarlyCache\Exception\CacheDirectoryNotAvailableException;
 use YPEarlyCache\Exception\WrongRuleException;
 
+/**
+ * Class Manager
+ * Main class to manipulate with cache
+ *
+ * @package YPEarlyCache
+ */
 class Manager
 {
 
@@ -28,6 +34,11 @@ class Manager
 	 * @var array
 	 */
 	private $cacheRule = null;
+
+	/**
+	 * @var string|null
+	 */
+	private $etag = null;
 
 	public function __construct(IConfig $config, Environment $env)
 	{
@@ -59,12 +70,27 @@ class Manager
 	public function flushCacheIfAble()
 	{
 		if (!$this->canGetCache()) {
+			if ($this->isCacheOn()) {
+				$this->etag = md5(uniqid());
+				$this->env->setHeader("ETag: {$this->etag}");
+			}
 			return false;
 		}
 
 		$content = file_get_contents($this->getCacheFilepath());
 		$rawMeta = file_get_contents($this->getCacheFilepath() . self::EXT_META);
 		$meta = json_decode($rawMeta);
+
+		if (isset($meta->etag)) {
+			// Etag implementation
+			$this->env->setHeader("ETag: {$meta->etag}");
+			$requestEtag = $this->env->requestHeader('If-None-Match');
+			if ($requestEtag == $meta->etag) {
+				$this->env->setResponseCode(304);
+				$this->env->finishOutput();
+				return true;
+			}
+		}
 
 		// Flush data to output
 		$this->env->setHeader("Cache-Control: max-age=" . $this->getCacheTime());
@@ -92,6 +118,7 @@ class Manager
 			'code' => $responseCode,
 			'rule' => $this->getCacheRule(),
 			'tags' => $this->getTags(),
+			'etag' => $this->etag,
 		);
 
 		if (count($this->getTags()) > 0) {
