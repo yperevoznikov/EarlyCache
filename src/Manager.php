@@ -83,9 +83,10 @@ class Manager
 
 		if (isset($meta->etag)) {
 			// Etag implementation
-			$requestEtag = $this->env->requestHeader('ETag');
+			$this->env->setHeader("ETag: {$meta->etag}");
+			$requestEtag = $this->env->requestHeader('If-None-Match');
 			if ($requestEtag == $meta->etag) {
-				$this->env->setResponseCode(302);
+				$this->env->setResponseCode(304);
 				$this->env->finishOutput();
 				return true;
 			}
