@@ -5,6 +5,7 @@
     "homepage": "https://github.com/yperevoznikov/EarlyCache",
     "type": "Library",
     "license": "MIT",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Yuriy Perevoznikov",
